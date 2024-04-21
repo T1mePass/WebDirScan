@@ -1,0 +1,13 @@
+index.php
+home.php
+login.php
+logout.php
+register.php
+about.php
+contact.php
+profile.php
+admin.php
+dashboard.php
+settings.php
+upload.php
+download.php
