@@ -1,10 +1,10 @@
 import requests
+import argparse
 from queue import Queue
 import sys
 import threading
 from agent_proxy import user_agent_list
-from optparse import OptionParser
-# from agent_proxy import ip_proxy
+from agent_proxy import ip_proxy
 
 class DirScan(threading.Thread):
 
@@ -21,7 +21,7 @@ class DirScan(threading.Thread):
             # print(user_agent_list.get_user_agent())
 
             try:
-                req = requests.get(url=url,headers= user_agent_list.get_user_agent(),timeout=8)
+                req = requests.get(url=url,headers= user_agent_list.get_user_agent(),timeout=8,proxies=ip_proxy.get_ip_proxy())
                 # print(url)
 
                 if req.status_code == 200:
@@ -52,6 +52,8 @@ def start(url, ext, count):
         t.start()
     for t in threads:
         t.join()
+
+    f.close()
     
 
 # if __name__ == '__main__':
@@ -73,19 +75,18 @@ __        __   _     ____  _      ____
    \_/\_/ \___|_.__/|____/|_|_|  |____/ \___\__,_|_| |_|
 """)
 
-    parser = OptionParser()
 
-    parser.add_option("-u","--url",dest="url",help="set target url")
-    parser.add_option("-f","--file",dest="ext",help="target url ext")
-    parser.add_option("-t","--thread",dest="count",type="int",default=2,help="set scan thread_count")
+    parser = argparse.ArgumentParser(description="Web Directory Scanner")
+
+    parser.add_argument("-u", "--url", dest="url", help="set target url", required=True)
+    parser.add_argument("-f", "--file", dest="ext", help="target url ext", required=True)
+    parser.add_argument("-t", "--thread", dest="count", type=int, default=2, help="set scan thread count")
 
 
-    (options, args) = parser.parse_args()
+    args = parser.parse_args()
 
-    # print(options)
-
-    if options.url and options.ext:
-        start(options.url,options.ext,options.count)
+    if args.url and args.ext:
+        start(args.url,args.ext,args.count)
         sys.exit(1)
     else:
         parser.print_help()
